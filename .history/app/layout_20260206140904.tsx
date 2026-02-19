@@ -10,7 +10,7 @@ weight: ['300','400','500','600','700'],
 variable: '--font-sans'});
 
 export const metadata: Metadata = {
-  title: "Amiani Health System",
+  title: "Daystar Afya",
   description: "Healthvisor",
   icons: {
     icon: '/assets/images/day3.png', 

@@ -64,8 +64,12 @@ export const registerPatient = async ({
     // Upload file ->  // https://appwrite.io/docs/references/cloud/client-web/storage#createFile
     let file;
     if (identificationDocument) {
-      const blobFile = identificationDocument?.get("blobFile") as Blob;
-      const inputFile = new InputFile(blobFile, identificationDocument?.get("fileName") || "file");
+      const inputFile =
+        identificationDocument &&
+        InputFile.fromBlob(
+          identificationDocument?.get("blobFile") as Blob,
+          identificationDocument?.get("fileName") as string
+        );
 
       file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
     }
