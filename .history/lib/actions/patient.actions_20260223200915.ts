@@ -69,7 +69,7 @@ export const registerPatient = async ({
 const blobFile = identificationDocument?.get("blobFile") as Blob;
 const fileName = identificationDocument?.get("fileName") as string;
 
-// Convert Blob to Buffer for node-appwrite InputFile compatibility
+// Convert Blob to Buffer for node-anewppwrite InputFile compatibility
 const buffer = Buffer.from(await blobFile.arrayBuffer());
 const inputFile = InputFile.fromBuffer(buffer, fileName); // Fixes the 0 arguments error
 
@@ -82,12 +82,12 @@ file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
       PATIENT_COLLECTION_ID!,
       ID.unique(),
       {
-        // FIX: Match your database column name 'identificationDocumentId'
-        identificationDocumentId: file?.$id || null, 
+        identificationDocumentId: file?.$id ? file.$id : null,
         identificationDocumentUrl: file?.$id
-          ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}`
+          ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view??project=${PROJECT_ID}`
           : null,
-        ...patient,
+        $id: patient.userId, // unique identifier for patient, same as userId
+    ...patient,
       }
     );
 

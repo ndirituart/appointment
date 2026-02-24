@@ -40,8 +40,7 @@ const RegisterForm = ({ user }: { user: User }) => {
     email: user?.email || "",
     phone: user?.phone || "",
   },
- });
-  
+});
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     setIsLoading(true);
 

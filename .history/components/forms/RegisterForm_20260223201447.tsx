@@ -62,7 +62,7 @@ const RegisterForm = ({ user }: { user: User }) => {
 
     try {
       const patient = {
-        userId: user.$id,
+        userId: user?.$id,
         name: values.name,
         email: values.email,
         phone: values.phone,

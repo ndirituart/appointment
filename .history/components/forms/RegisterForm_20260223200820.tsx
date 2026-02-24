@@ -31,17 +31,17 @@ const RegisterForm = ({ user }: { user: User }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
- const form = useForm<z.infer<typeof PatientFormValidation>>({
-  resolver: zodResolver(PatientFormValidation),
-  defaultValues: {
-    ...PatientFormDefaultValues,
-    // Add the '?' to prevent 'Cannot read properties of undefined'
-    name: user?.name || "", 
-    email: user?.email || "",
-    phone: user?.phone || "",
-  },
- });
-  
+  const form = useForm<z.infer<typeof PatientFormValidation>>({
+    resolver: zodResolver(PatientFormValidation),
+    defaultValues: {
+      ...PatientFormDefaultValues,
+      //adding clause to avoid crashing when user isn't found
+   name: user?.name || "",
+   email: user?.email || "",
+   phone: user?.phone || "",
+    },
+  });
+
   const onSubmit = async (values: z.infer<typeof PatientFormValidation>) => {
     setIsLoading(true);
 
@@ -175,8 +175,8 @@ const RegisterForm = ({ user }: { user: User }) => {
                       <Label htmlFor={option} className="cursor-pointer">
                         {option}
                       </Label>
-                    </div>
-                  ))}
+  </div>
+))}
                   </RadioGroup>
                 </FormControl>
               )}
