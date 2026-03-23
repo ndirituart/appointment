@@ -11,7 +11,7 @@ variable: '--font-sans'});
 
 export const metadata: Metadata = {
   title: "Daystar Afya",
-  description: "Healthvisor",
+  description: "Hospital appointment booking system just for you!",
   icons: {
     icon: '/assets/images/day3.png', 
   },
