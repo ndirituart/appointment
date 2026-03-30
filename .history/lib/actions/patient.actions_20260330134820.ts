@@ -116,18 +116,15 @@ export const registerPatient = async ({ identificationDocument, ...patient }: Re
 // GET PATIENT
 export const getPatient = async (userId: string) => {
   try {
+    console.log("🛠️ Searching Collection:", PATIENT_COLLECTION_ID); // Confirm this ID matches Appwrite
     const patients = await databases.listDocuments(
       DATABASE_ID!,
       PATIENT_COLLECTION_ID!,
       [Query.equal('userId', userId)]
     );
-
-    // If no document is found, this returns undefined, causing your form error
-    if (patients.total === 0) {
-      console.error("❌ No patient document found for this userId in Appwrite.");
-      return null;
-    }
-
+    // DEBUG: If this logs 'NO PATIENT FOUND', the issue is the Query or Index
+  console.log("SERVER SIDE CHECK - Patient found:", patients.documents[0] ? patients.documents[0].$id : "NO PATIENT FOUND");
+    
     return parseStringify(patients.documents[0]);
   } catch (error) {
     console.error("Query Error:", error);

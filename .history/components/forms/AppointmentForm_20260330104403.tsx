@@ -35,11 +35,7 @@ export const AppointmentForm = ({
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  }) => {
-  
-  //see how patientId is being communicated back that it keeps failing
-  console.log("PROPS CHECK - patientId:", patientId);
-  
+}) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,28 +59,26 @@ export const AppointmentForm = ({
 
   try {
     // --- CREATE FLOW ---
-    console.log("🔍 Component patientId:", patientId);
+    if (type === "create") {
+      if (!patientId) {
+        console.error("❌ Aborting: patientId is undefined. Check if the patient exists in the DB.");
+        setIsLoading(false);
+        return; 
+      }
 
-   if (type === "create") {
-  if (!patientId) {
-    console.error("❌ Aborting: patientId is undefined.");
-    setIsLoading(false);
-    return;
-  }
+      const appointmentData = {
+        userId,
+        patient: patientId,
+        primaryPhysician: values.primaryPhysician,
+        schedule: new Date(values.schedule),
+        reason: values.reason!,
+        status: status as Status,
+        note: values.note,
+      };
 
-  const appointmentData = {
-    userId,
-    patientId: patientId, // ✅ Use 'patientId' to match your DB column, NOT 'patient'
-    primaryPhysician: values.primaryPhysician,
-    schedule: new Date(values.schedule),
-    reason: values.reason!,
-    status: status as Status,
-    note: values.note,
-  };
+      console.log("🛰️ Attempting to CREATE appointment:", appointmentData);
+      const newAppointment = await createAppointment(appointmentData);
 
-  console.log("🛰️ Sending to DB:", appointmentData);
-     const newAppointment = await createAppointment(appointmentData);
-     
       if (newAppointment) {
         console.log("✅ Success: Appointment created", newAppointment.$id);
         form.reset();
@@ -241,3 +235,4 @@ export const AppointmentForm = ({
     
   );
 };
+}

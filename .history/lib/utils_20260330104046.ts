@@ -4,9 +4,7 @@ import { twMerge } from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-//updating this function to handle JSON data about user/patient/appointment objects, which often contain nested structures and Date objects that need to be serialized properly. The original function was a simple wrapper around JSON.stringify and JSON.parse, but it didn't handle cases where the input might be null or undefined, or where Date objects needed to be converted to strings for proper serialization.
-
-// The updated function now includes checks for null or undefined values, and it also ensures that Date objects are converted to ISO strings before being stringified. This makes it more robust and suitable for handling the complex data structures commonly used in applications that manage user, patient, and appointment information.
+//updating this function to handle JSON data about user/patient
 export const parseStringify = (value: any) => 
   value ? JSON.parse(JSON.stringify(value)) : null;
 

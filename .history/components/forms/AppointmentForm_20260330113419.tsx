@@ -23,6 +23,8 @@ import SubmitButton from "../SubmitButton";
 import { Form } from "../ui/form";
 import CustomFormField, { FormFieldType } from "../CustomForm";
 
+import { getPatient } from "@/lib/actions/patient.actions";
+
 export const AppointmentForm = ({
   userId,
   patientId,
@@ -35,11 +37,14 @@ export const AppointmentForm = ({
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  }) => {
-  
-  //see how patientId is being communicated back that it keeps failing
-  console.log("PROPS CHECK - patientId:", patientId);
-  
+  }) 
+  // Fetch patient data using the ID from the URL
+  const patient = await getPatient(userId);
+
+  // LOG TO VS CODE TERMINAL: 
+  console.log("🔍 FETCHED PATIENT FOR FORM:", patient?.$id);
+
+  => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,76 +63,74 @@ export const AppointmentForm = ({
     },
   });
 
- const onSubmit = async (values: z.infer<typeof AppointmentFormValidation>) => {
-  setIsLoading(true);
+  const onSubmit = async (values: z.infer<typeof AppointmentFormValidation>) => {
+    setIsLoading(true);
 
-  try {
-    // --- CREATE FLOW ---
-    console.log("🔍 Component patientId:", patientId);
+    try {
+      // --- CREATE FLOW ---
+      if (type === "create") {
+        if (!patientId) {
+          console.error("❌ Aborting: patientId is undefined.");
+          setIsLoading(false);
+          return;
+        }
 
-   if (type === "create") {
-  if (!patientId) {
-    console.error("❌ Aborting: patientId is undefined.");
-    setIsLoading(false);
-    return;
-  }
-
-  const appointmentData = {
-    userId,
-    patientId: patientId, // ✅ Use 'patientId' to match your DB column, NOT 'patient'
-    primaryPhysician: values.primaryPhysician,
-    schedule: new Date(values.schedule),
-    reason: values.reason!,
-    status: status as Status,
-    note: values.note,
-  };
-
-  console.log("🛰️ Sending to DB:", appointmentData);
-     const newAppointment = await createAppointment(appointmentData);
-     
-      if (newAppointment) {
-        console.log("✅ Success: Appointment created", newAppointment.$id);
-        form.reset();
-        router.push(`/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`);
-      }
-    } 
-    
-    // --- UPDATE FLOW (Schedule or Cancel) ---
-    else {
-      if (!appointment?.$id) {
-        console.error("❌ Aborting: No appointment ID found for update.");
-        setIsLoading(false);
-        return;
-      }
-
-      const appointmentToUpdate = {
-        userId,
-        appointmentId: appointment.$id,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        appointment: {
+        const appointmentData = {
+          userId,
+          patientId: patientId, // ✅ Use 'patientId' to match your DB column, NOT 'patient'
           primaryPhysician: values.primaryPhysician,
           schedule: new Date(values.schedule),
+          reason: values.reason!,
           status: status as Status,
-          cancellationReason: values.cancellationReason,
-        },
-        type,
-      };
+          note: values.note,
+        };
 
-      console.log("🛰️ Attempting to UPDATE appointment:", appointmentToUpdate);
-      const updatedAppointment = await updateAppointment(appointmentToUpdate);
-
-      if (updatedAppointment) {
-        console.log("✅ Success: Appointment updated");
-        setOpen && setOpen(false);
-        form.reset();
+        console.log("🛰️ Sending to DB:", appointmentData);
+        const newAppointment = await createAppointment(appointmentData);
+     
+        if (newAppointment) {
+          console.log("✅ Success: Appointment created", newAppointment.$id);
+          form.reset();
+          router.push(`/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`);
+        }
       }
+    
+      // --- UPDATE FLOW (Schedule or Cancel) ---
+      else {
+        if (!appointment?.$id) {
+          console.error("❌ Aborting: No appointment ID found for update.");
+          setIsLoading(false);
+          return;
+        }
+
+        const appointmentToUpdate = {
+          userId,
+          appointmentId: appointment.$id,
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          appointment: {
+            primaryPhysician: values.primaryPhysician,
+            schedule: new Date(values.schedule),
+            status: status as Status,
+            cancellationReason: values.cancellationReason,
+          },
+          type,
+        };
+
+        console.log("🛰️ Attempting to UPDATE appointment:", appointmentToUpdate);
+        const updatedAppointment = await updateAppointment(appointmentToUpdate);
+
+        if (updatedAppointment) {
+          console.log("✅ Success: Appointment updated");
+          setOpen && setOpen(false);
+          form.reset();
+        }
+      }
+    } catch (error) {
+      console.error(`❌ Global Error in ${type}:`, error);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error(`❌ Global Error in ${type}:`, error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
 
   let buttonLabel;
@@ -144,15 +147,15 @@ export const AppointmentForm = ({
 
   return (
     <Form {...form}>
-  <form 
+      <form
         onSubmit={form.handleSubmit(onSubmit, (errors) => {
-      //better form error validation to find root cause of isses
-      console.log("⚠️ Validation Errors:", errors);
-    })} 
-    className="flex-1 space-y-6"
+          //better form error validation to find root cause of isses
+          console.log("⚠️ Validation Errors:", errors);
+        })}
+        className="flex-1 space-y-6"
       >
         
-    {type === "create" && (
+        {type === "create" && (
           <section className="mb-12 space-y-4">
             <h1 className="header">New Appointment</h1>
             <p className="text-dark-700">

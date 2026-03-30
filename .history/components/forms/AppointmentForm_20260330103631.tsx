@@ -35,11 +35,7 @@ export const AppointmentForm = ({
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  }) => {
-  
-  //see how patientId is being communicated back that it keeps failing
-  console.log("PROPS CHECK - patientId:", patientId);
-  
+}) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,76 +54,7 @@ export const AppointmentForm = ({
     },
   });
 
- const onSubmit = async (values: z.infer<typeof AppointmentFormValidation>) => {
-  setIsLoading(true);
-
-  try {
-    // --- CREATE FLOW ---
-    console.log("🔍 Component patientId:", patientId);
-
-   if (type === "create") {
-  if (!patientId) {
-    console.error("❌ Aborting: patientId is undefined.");
-    setIsLoading(false);
-    return;
-  }
-
-  const appointmentData = {
-    userId,
-    patientId: patientId, // ✅ Use 'patientId' to match your DB column, NOT 'patient'
-    primaryPhysician: values.primaryPhysician,
-    schedule: new Date(values.schedule),
-    reason: values.reason!,
-    status: status as Status,
-    note: values.note,
-  };
-
-  console.log("🛰️ Sending to DB:", appointmentData);
-     const newAppointment = await createAppointment(appointmentData);
-     
-      if (newAppointment) {
-        console.log("✅ Success: Appointment created", newAppointment.$id);
-        form.reset();
-        router.push(`/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`);
-      }
-    } 
-    
-    // --- UPDATE FLOW (Schedule or Cancel) ---
-    else {
-      if (!appointment?.$id) {
-        console.error("❌ Aborting: No appointment ID found for update.");
-        setIsLoading(false);
-        return;
-      }
-
-      const appointmentToUpdate = {
-        userId,
-        appointmentId: appointment.$id,
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        appointment: {
-          primaryPhysician: values.primaryPhysician,
-          schedule: new Date(values.schedule),
-          status: status as Status,
-          cancellationReason: values.cancellationReason,
-        },
-        type,
-      };
-
-      console.log("🛰️ Attempting to UPDATE appointment:", appointmentToUpdate);
-      const updatedAppointment = await updateAppointment(appointmentToUpdate);
-
-      if (updatedAppointment) {
-        console.log("✅ Success: Appointment updated");
-        setOpen && setOpen(false);
-        form.reset();
-      }
-    }
-  } catch (error) {
-    console.error(`❌ Global Error in ${type}:`, error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+ 
 
 
   let buttonLabel;

@@ -1,9 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+
 import { PatientForm } from "@/components/forms/PatientForm";
 import { PasskeyModal } from "@/components/PasskeyModal";
+//to get patient details and Id
+import { getPatient } from "@/lib/actions/patient.actions";
+import { AppointmentForm } from "@/components/forms/AppointmentForm";
 
-export default function Home({ searchParams }: SearchParamProps) {
+const Home = ({ searchParams }: SearchParamProps) => {
   const isAdmin = searchParams?.admin === "true";
 
   return (
@@ -16,7 +20,7 @@ export default function Home({ searchParams }: SearchParamProps) {
             src="/assets/images/emblem.png"
             height={1000}
             width={1000}
-            alt="logo"
+            alt="patient"
             className="mb-2 h-20 w-fit"
           />
 
@@ -37,9 +41,34 @@ export default function Home({ searchParams }: SearchParamProps) {
         src="/assets/images/my-doc1.jpg"
         height={600}
         width={1000}
-        alt="doctor"
+        alt="patient"
         className="side-img max-w-[50%]"
       />
     </div>
   );
+};
+
+export default async function NewAppointment({ params: { userId } }: SearchParamProps) {
+  // 1. Fetch the patient document
+  const patient = await getPatient(userId);
+
+  // 2. Debugging Log (Check your VS Code Terminal for this!)
+  console.log("🔍 FETCHED PATIENT FOR FORM:", patient?.$id);
+
+  return (
+    <div className="flex h-screen max-h-screen">
+      <section className="remove-scrollbar container my-auto">
+        <div className="sub-container max-w-[860px] flex-1 justify-between">
+          <AppointmentForm 
+            type="create"
+            userId={userId}
+            patientId={patient?.$id} // This MUST be the document $id
+          />
+          <p className="copyright mt-10 py-12">© 2026 CarePulse</p>
+        </div>
+      </section>
+    </div>
+  );
 }
+
+export default Home;

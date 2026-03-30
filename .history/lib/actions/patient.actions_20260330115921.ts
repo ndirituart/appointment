@@ -122,15 +122,16 @@ export const getPatient = async (userId: string) => {
       [Query.equal('userId', userId)]
     );
 
-    // If no document is found, this returns undefined, causing your form error
-    if (patients.total === 0) {
-      console.error("❌ No patient document found for this userId in Appwrite.");
+    console.log("📡 Appwrite Raw Response:", JSON.stringify(patients, null, 2));
+
+    if (patients.documents.length === 0) {
+      console.log("⚠️ No document found in collection for userId:", userId);
       return null;
     }
 
     return parseStringify(patients.documents[0]);
   } catch (error) {
-    console.error("Query Error:", error);
+    console.error("❌ Appwrite Query Error:", error);
     return null;
   }
 };

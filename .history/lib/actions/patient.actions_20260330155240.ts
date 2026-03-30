@@ -119,7 +119,8 @@ export const getPatient = async (userId: string) => {
     const patients = await databases.listDocuments(
       DATABASE_ID!,
       PATIENT_COLLECTION_ID!,
-      [Query.equal('userId', userId)]
+      '69ca0dbf002768cac060'
+      // [Query.equal('userId', userId)]
     );
 
     // If no document is found, this returns undefined, causing your form error

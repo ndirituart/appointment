@@ -1,9 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+
 import { PatientForm } from "@/components/forms/PatientForm";
 import { PasskeyModal } from "@/components/PasskeyModal";
+//to get patient details and Id
+import { getPatient } from "@/lib/actions/patient.actions";
+import { AppointmentForm } from "@/components/forms/AppointmentForm";
 
-export default function Home({ searchParams }: SearchParamProps) {
+const Home = ({ searchParams }: SearchParamProps) => {
   const isAdmin = searchParams?.admin === "true";
 
   return (
@@ -16,7 +20,7 @@ export default function Home({ searchParams }: SearchParamProps) {
             src="/assets/images/emblem.png"
             height={1000}
             width={1000}
-            alt="logo"
+            alt="patient"
             className="mb-2 h-20 w-fit"
           />
 
@@ -37,9 +41,11 @@ export default function Home({ searchParams }: SearchParamProps) {
         src="/assets/images/my-doc1.jpg"
         height={600}
         width={1000}
-        alt="doctor"
+        alt="patient"
         className="side-img max-w-[50%]"
       />
     </div>
   );
-}
+};
+
+export default Home;

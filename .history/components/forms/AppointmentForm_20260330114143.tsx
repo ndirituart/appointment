@@ -35,11 +35,7 @@ export const AppointmentForm = ({
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  }) => {
-  
-  //see how patientId is being communicated back that it keeps failing
-  console.log("PROPS CHECK - patientId:", patientId);
-  
+}) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,8 +59,6 @@ export const AppointmentForm = ({
 
   try {
     // --- CREATE FLOW ---
-    console.log("🔍 Component patientId:", patientId);
-
    if (type === "create") {
   if (!patientId) {
     console.error("❌ Aborting: patientId is undefined.");

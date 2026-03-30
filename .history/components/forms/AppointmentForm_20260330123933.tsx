@@ -35,11 +35,7 @@ export const AppointmentForm = ({
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  }) => {
-  
-  //see how patientId is being communicated back that it keeps failing
-  console.log("PROPS CHECK - patientId:", patientId);
-  
+}) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -107,7 +103,7 @@ export const AppointmentForm = ({
         appointment: {
           primaryPhysician: values.primaryPhysician,
           schedule: new Date(values.schedule),
-          status: status as Status,
+          status: value.status as Status,
           cancellationReason: values.cancellationReason,
         },
         type,
