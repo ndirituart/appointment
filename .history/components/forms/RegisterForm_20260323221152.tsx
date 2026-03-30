@@ -39,9 +39,6 @@ const RegisterForm = ({ user }: { user: User }) => {
     name: user?.name || "", 
     email: user?.email || "",
     phone: user?.phone || "",
-   treatmentConsent: true, 
-    disclosureConsent: true,
-    privacyConsent: true,
   },
  });
   
@@ -89,8 +86,6 @@ const RegisterForm = ({ user }: { user: User }) => {
           ? formData
           : undefined,
         privacyConsent: values.privacyConsent,
-        treatmentConsent: values.treatmentConsent,
-        disclosureConsent: values.disclosureConsent,
       };
 
       const newPatient = await registerPatient(patient);
@@ -102,13 +97,11 @@ const RegisterForm = ({ user }: { user: User }) => {
       console.log(error);
     }
 
-    setIsLoading(true);
+    setIsLoading(false);
   };
 
   return (
-    /*nimeshindwa kutoa error kwa onSubmit button however logic works at it should and data is sent to Appwrite correctly*/ 
     <Form {...form}>
-      
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-12">
         <section className="space-y-4">
           <h1 className="header">Welcome</h1>

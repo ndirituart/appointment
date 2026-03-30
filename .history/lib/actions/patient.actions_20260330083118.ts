@@ -94,7 +94,7 @@ export const registerPatient = async ({ identificationDocument, ...patient }: Re
         birthDate: new Date(patient.birthDate).toISOString(),
         
         // FIX: Match 'identityType' 
-        identificationType: patient.identificationType, 
+        identityType: patient.identificationType, 
         
         // FIX: Match 'identificationDocumentId' and handle null case
         identificationDocumentId: file?.$id || null, 

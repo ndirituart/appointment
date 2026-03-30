@@ -59,60 +59,49 @@ export const getUser = async (userId: string) => {
     return null; 
   }
 };
-
-
 // REGISTER PATIENT
-// lib/actions/patient.actions.ts
-
-export const registerPatient = async ({ identificationDocument, ...patient }: RegisterUserParams) => {
-  // Debug: Log consent values if they exist
-  if ('treatmentConsent' in patient) console.log("RECEIVED ON SERVER:", patient.treatmentConsent);
-  if ('disclosureConsent' in patient) console.log("RECEIVED ON SERVER:", patient.disclosureConsent);
-  if ('privacyConsent' in patient) console.log("RECEIVED ON SERVER:", patient.privacyConsent);
-  
-
+export const registerPatient = async ({
+  identificationDocument,
+  ...patient
+}: RegisterUserParams) => {
   try {
+    // Upload file ->  // https://appwrite.io/docs/references/cloud/client-web/storage#createFile
     let file;
-
-    // 1. Upload the file if it exists
     if (identificationDocument) {
-      const inputFile = InputFile.fromBuffer(
-        identificationDocument?.get("blobFile") as Blob,
-        identificationDocument?.get("fileName") as string
-      );
-      file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
+      // 1. Correct InputFile usage
+// In node-appwrite, InputFile.fromBuffer or InputFile.fromBlob is used
+const blobFile = identificationDocument?.get("blobFile") as Blob;
+const fileName = identificationDocument?.get("fileName") as string;
+
+// Convert Blob to Buffer for node-appwrite InputFile compatibility
+const buffer = Buffer.from(await blobFile.arrayBuffer());
+const inputFile = InputFile.fromBuffer(buffer, fileName); // Fixes the 0 arguments error
+
+file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
     }
 
-    // 2. Create the document with EXACT attribute mapping
+    // Create new patient document -> https://appwrite.io/docs/references/cloud/server-nodejs/databases#createDocument
     const newPatient = await databases.createDocument(
       DATABASE_ID!,
       PATIENT_COLLECTION_ID!,
       ID.unique(),
       {
-        ...patient,
-        // Convert Date to String
-        birthDate: new Date(patient.birthDate).toISOString(),
-        
-        // FIX: Match 'identityType' 
-        identificationType: patient.identificationType, 
-        
-        // FIX: Match 'identificationDocumentId' and handle null case
+        // FIX: Match your database column name 'identificationDocumentId'
         identificationDocumentId: file?.$id || null, 
-        
-        // FIX: Construct the URL manually
         identificationDocumentUrl: file?.$id
           ? `${ENDPOINT}/storage/buckets/${BUCKET_ID}/files/${file.$id}/view?project=${PROJECT_ID}`
           : null,
+        
+        ...patient,
       }
     );
 
     return parseStringify(newPatient);
-  }  catch (error: any) {
-   
-    console.log("FULL ERROR JSON:", JSON.stringify(error.response, null, 2));
-    console.error("APPWRITE ERROR:", error.message);
-}
+  } catch (error) {
+    console.error("An error occurred while creating a new patient:", error);
+  }
 };
+
 // GET PATIENT
   export const getPatient = async (userId: string) => {
     try {

@@ -65,12 +65,6 @@ export const getUser = async (userId: string) => {
 // lib/actions/patient.actions.ts
 
 export const registerPatient = async ({ identificationDocument, ...patient }: RegisterUserParams) => {
-  // Debug: Log consent values if they exist
-  if ('treatmentConsent' in patient) console.log("RECEIVED ON SERVER:", patient.treatmentConsent);
-  if ('disclosureConsent' in patient) console.log("RECEIVED ON SERVER:", patient.disclosureConsent);
-  if ('privacyConsent' in patient) console.log("RECEIVED ON SERVER:", patient.privacyConsent);
-  
-
   try {
     let file;
 
@@ -90,13 +84,13 @@ export const registerPatient = async ({ identificationDocument, ...patient }: Re
       ID.unique(),
       {
         ...patient,
-        // Convert Date to String
+        // Convert Date to String (Appwrite requirement for String attributes)
         birthDate: new Date(patient.birthDate).toISOString(),
         
-        // FIX: Match 'identityType' 
-        identificationType: patient.identificationType, 
+        // FIX: Match 'identityType' (from your Appwrite screenshot)
+        identityType: patient.identificationType, 
         
-        // FIX: Match 'identificationDocumentId' and handle null case
+        // FIX: Match 'identificationDocumentId' (from your Appwrite screenshot)
         identificationDocumentId: file?.$id || null, 
         
         // FIX: Construct the URL manually
@@ -107,11 +101,11 @@ export const registerPatient = async ({ identificationDocument, ...patient }: Re
     );
 
     return parseStringify(newPatient);
-  }  catch (error: any) {
-   
-    console.log("FULL ERROR JSON:", JSON.stringify(error.response, null, 2));
-    console.error("APPWRITE ERROR:", error.message);
-}
+  } catch (error: any) {
+    console.error("An error occurred while creating a new patient:", error);
+    // This will show you exactly which field Appwrite is rejecting
+    throw error; 
+  }
 };
 // GET PATIENT
   export const getPatient = async (userId: string) => {

@@ -39,9 +39,6 @@ const RegisterForm = ({ user }: { user: User }) => {
     name: user?.name || "", 
     email: user?.email || "",
     phone: user?.phone || "",
-   treatmentConsent: true, 
-    disclosureConsent: true,
-    privacyConsent: true,
   },
  });
   
@@ -71,7 +68,7 @@ const RegisterForm = ({ user }: { user: User }) => {
         email: values.email,
         phone: values.phone,
         birthDate: new Date(values.birthDate),
-        gender: values.gender as Gender,
+        gender: (values.gender as string).charAt(0).toUpperCase() + (values.gender as string).slice(1) as Gender,
         address: values.address,
         occupation: values.occupation,
         emergencyContactName: values.emergencyContactName,
@@ -89,8 +86,6 @@ const RegisterForm = ({ user }: { user: User }) => {
           ? formData
           : undefined,
         privacyConsent: values.privacyConsent,
-        treatmentConsent: values.treatmentConsent,
-        disclosureConsent: values.disclosureConsent,
       };
 
       const newPatient = await registerPatient(patient);
@@ -102,13 +97,11 @@ const RegisterForm = ({ user }: { user: User }) => {
       console.log(error);
     }
 
-    setIsLoading(true);
+    setIsLoading(false);
   };
 
   return (
-    /*nimeshindwa kutoa error kwa onSubmit button however logic works at it should and data is sent to Appwrite correctly*/ 
     <Form {...form}>
-      
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-12">
         <section className="space-y-4">
           <h1 className="header">Welcome</h1>
@@ -168,20 +161,21 @@ const RegisterForm = ({ user }: { user: User }) => {
               label="Gender"
               renderSkeleton={(field) => (
                 <FormControl>
-                <RadioGroup
-              onValueChange={field.onChange} 
-              defaultValue={field.value}
-              className="flex h-11 gap-6 xl:justify-between"
-            >
-              {GenderOptions.map((option) => (
-                <div key={option} className="radio-group">
-                  <RadioGroupItem value={option} id={option} /> 
-                  <Label htmlFor={option} className="cursor-pointer">
-                    {option}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+                  <RadioGroup
+                    className="flex h-11 gap-6 xl:justify-between"
+                    onValueChange={(value) => field.onChange(value.toLowerCase())}
+                    defaultValue={field.value?.toLowerCase()}
+                  >
+                    {GenderOptions.map((option, i) => (
+                    <div key={option + i} className="radio-group">
+                      {/* Use .toLowerCase() so the form sends 'female' instead of 'Female' */}
+                      <RadioGroupItem value={option.toLowerCase()} id={option} />
+                      <Label htmlFor={option} className="cursor-pointer">
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                  </RadioGroup>
                 </FormControl>
               )}
             />
