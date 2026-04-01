@@ -3,7 +3,7 @@ import * as sdk from "node-appwrite";
 
 export const {
   NEXT_PUBLIC_APPWRITE_PROJECT_ID: PROJECT_ID,
-  NEXT_PUBLIC_APPWRITE_API_KEY: API_KEY, // Note: API Keys should usually stay private (no NEXT_PUBLIC)
+  APPWRITE_API_KEY: API_KEY, // Note: API Keys should usually stay private (no NEXT_PUBLIC)
   NEXT_PUBLIC_APPWRITE_DATABASE_ID: DATABASE_ID,
   NEXT_PUBLIC_APPWRITE_PATIENT_COLLECTION_ID: PATIENT_COLLECTION_ID,
   NEXT_PUBLIC_APPWRITE_BUCKET_ID: BUCKET_ID, // Fixed the 'BUCECT' typo

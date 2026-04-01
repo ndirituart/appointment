@@ -43,14 +43,13 @@ export const getRecentAppointmentList = async () => {
     );
 
 
-    //set to default ZERO
+    //set to default 
     const initialCounts = {
       scheduledCount: 0,
       pendingCount: 0,
       cancelledCount: 0,
     };
 
-    //iterate count depending on the status of the appointment
     const counts = (appointments.documents as Appointment[]).reduce(
       (acc, appointment) => {
         switch (appointment.status) {
@@ -69,7 +68,6 @@ export const getRecentAppointmentList = async () => {
       initialCounts
     );
 
-    //count total for each status and total count of all appointments
     const data = {
       totalCount: appointments.total,
       ...counts,

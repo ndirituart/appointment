@@ -38,19 +38,17 @@ export const getRecentAppointmentList = async () => {
     const appointments = await databases.listDocuments(
       DATABASE_ID!,
       APPOINTMENT_COLLECTION_ID!,
-      //to query from latest appointmnet to oldest
+      //to query from latest appointmnet to 
       [Query.orderDesc("$createdAt")]
     );
 
 
-    //set to default ZERO
     const initialCounts = {
       scheduledCount: 0,
       pendingCount: 0,
       cancelledCount: 0,
     };
 
-    //iterate count depending on the status of the appointment
     const counts = (appointments.documents as Appointment[]).reduce(
       (acc, appointment) => {
         switch (appointment.status) {
@@ -69,7 +67,6 @@ export const getRecentAppointmentList = async () => {
       initialCounts
     );
 
-    //count total for each status and total count of all appointments
     const data = {
       totalCount: appointments.total,
       ...counts,

@@ -69,7 +69,7 @@ export const getRecentAppointmentList = async () => {
       initialCounts
     );
 
-    //count total for each status and total count of all appointments
+    //count total for each 
     const data = {
       totalCount: appointments.total,
       ...counts,

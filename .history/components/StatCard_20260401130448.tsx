@@ -8,7 +8,7 @@ interface StatCardProps {
   icon: string;
 }
 
-export const StatCard = ({ count = 0, label, icon, type }: StatCardProps) => {
+const StatCard = ({ count = 0, label, icon, type }: StatCardProps) => {
   // Define the glow colors based on the type
   const glowStyles = {
     appointments: "hover:shadow-[0_0_15px_rgba(255,215,0,0.6)] hover:border-yellow-400 active:shadow-[0_0_20px_rgba(255,215,0,0.8)]",
