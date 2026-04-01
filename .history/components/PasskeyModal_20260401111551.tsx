@@ -42,7 +42,7 @@ export const PasskeyModal = () => {
       } else {
         setOpen(true);
       }
-  }, [encryptedKey, path, router]); //to fix the missing dependency warning
+  }, [encryptedKey, path, router]); //to 
 
   const closeModal = () => {
     setOpen(false);

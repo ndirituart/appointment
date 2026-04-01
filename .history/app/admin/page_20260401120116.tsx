@@ -34,6 +34,7 @@ const AdminPage = async () => {
         </section>
 
         <section className="admin-stat">
+          
           <StatCard
             type="appointments"
             count={appointments.scheduledCount}
