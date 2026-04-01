@@ -1,7 +1,6 @@
 "use server";
 
 import { ID, Query, InputFile } from "node-appwrite";
-// npm install node-appwrite@12.0.1
 
 import {
   BUCKET_ID,

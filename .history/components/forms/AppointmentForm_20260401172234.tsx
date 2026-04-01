@@ -41,9 +41,7 @@ export const AppointmentForm = ({
 
   const AppointmentFormValidation = getAppointmentSchema(type);
 
-  type AppointmentFormType = z.infer<typeof AppointmentFormValidation>;
-  
-  const form = useForm<AppointmentFormType>({
+  const form = useForm<z.infer<typeof AppointmentFormValidation>>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
       primaryPhysician: appointment ? appointment?.primaryPhysician : "",
@@ -150,7 +148,7 @@ export const AppointmentForm = ({
           <>
             <CustomFormField
               fieldType={FormFieldType.SELECT}
-              control={form.control as any}
+              control={form.control}
               name="primaryPhysician"
               label="Doctor"
               placeholder="Select a doctor"
@@ -173,7 +171,7 @@ export const AppointmentForm = ({
 
             <CustomFormField
               fieldType={FormFieldType.DATE_PICKER}
-              control={form.control as any}
+              control={form.control}
               name="schedule"
               label="Expected appointment date"
               showTimeSelect
@@ -185,7 +183,7 @@ export const AppointmentForm = ({
             >
               <CustomFormField
                 fieldType={FormFieldType.TEXTAREA}
-                control={form.control as any}
+                control={form.control}
                 name="reason"
                 label="Appointment reason"
                 placeholder="Annual montly check-up"
@@ -194,7 +192,7 @@ export const AppointmentForm = ({
 
               <CustomFormField
                 fieldType={FormFieldType.TEXTAREA}
-                control={form.control as any}
+                control={form.control}
                 name="note"
                 label="Comments/notes"
                 placeholder="Prefer afternoon appointments, if possible"
@@ -207,7 +205,7 @@ export const AppointmentForm = ({
         {type === "cancel" && (
           <CustomFormField
             fieldType={FormFieldType.TEXTAREA}
-            control={form.control as any}
+            control={form.control}
             name="cancellationReason"
             label="Reason for cancellation"
             placeholder="Urgent meeting came up"

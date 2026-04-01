@@ -52,9 +52,13 @@ export const PatientForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
+
+<form 
+  onSubmit={form.handleSubmit(onSubmit, (errors) => console.log("Validation Errors:", errors))} 
+  className="flex-1 space-y-6"
+>
         <section className="mb-12 space-y-4">
-          <h1 className="header">Daystar Afya</h1>
+          <h1 className="header">Amiani HealthCare System</h1>
           <p className="text-dark-700">Get started with appointments.</p>
         </section>
 
@@ -63,7 +67,7 @@ export const PatientForm = () => {
           control={form.control}
           name="name"
           label="Full name"
-          placeholder="Madede Chadwick"
+          placeholder="John Doe"
           iconSrc="/assets/icons/user.svg"
           iconAlt="user"
         />
@@ -73,7 +77,7 @@ export const PatientForm = () => {
           control={form.control}
           name="email"
           label="Email"
-          placeholder="madedechadwick@gmail.com"
+          placeholder="johndoek@gmail.com"
           iconSrc="/assets/icons/email.svg"
           iconAlt="email"
         />

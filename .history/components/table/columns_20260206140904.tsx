@@ -22,8 +22,7 @@ export const columns: ColumnDef<Appointment>[] = [
     header: "Patient",
     cell: ({ row }) => {
       const appointment = row.original;
-      // The ?. and the || fallback prevent the 500 error
-return <p className="text-14-medium ">{appointment.patient?.name || "Unknown Patient"}</p>;
+      return <p className="text-14-medium ">{appointment.patient.name}</p>;
     },
   },
   {
@@ -83,7 +82,7 @@ return <p className="text-14-medium ">{appointment.patient?.name || "Unknown Pat
       return (
         <div className="flex gap-1">
           <AppointmentModal
-            patientId={appointment.patient?.$id}
+            patientId={appointment.patient.$id}
             userId={appointment.userId}
             appointment={appointment}
             type="schedule"
@@ -91,7 +90,7 @@ return <p className="text-14-medium ">{appointment.patient?.name || "Unknown Pat
             description="Please confirm the following details to schedule."
           />
           <AppointmentModal
-            patientId={appointment.patient?.$id}
+            patientId={appointment.patient.$id}
             userId={appointment.userId}
             appointment={appointment}
             type="cancel"

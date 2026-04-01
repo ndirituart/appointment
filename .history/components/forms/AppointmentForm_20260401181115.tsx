@@ -150,7 +150,7 @@ export const AppointmentForm = ({
           <>
             <CustomFormField
               fieldType={FormFieldType.SELECT}
-              control={form.control as any}
+              control={form.control}
               name="primaryPhysician"
               label="Doctor"
               placeholder="Select a doctor"
@@ -173,7 +173,7 @@ export const AppointmentForm = ({
 
             <CustomFormField
               fieldType={FormFieldType.DATE_PICKER}
-              control={form.control as any}
+              control={form.control}
               name="schedule"
               label="Expected appointment date"
               showTimeSelect
@@ -185,7 +185,7 @@ export const AppointmentForm = ({
             >
               <CustomFormField
                 fieldType={FormFieldType.TEXTAREA}
-                control={form.control as any}
+                control={form.control}
                 name="reason"
                 label="Appointment reason"
                 placeholder="Annual montly check-up"
@@ -194,7 +194,7 @@ export const AppointmentForm = ({
 
               <CustomFormField
                 fieldType={FormFieldType.TEXTAREA}
-                control={form.control as any}
+                control={form.control}
                 name="note"
                 label="Comments/notes"
                 placeholder="Prefer afternoon appointments, if possible"
@@ -207,7 +207,7 @@ export const AppointmentForm = ({
         {type === "cancel" && (
           <CustomFormField
             fieldType={FormFieldType.TEXTAREA}
-            control={form.control as any}
+            control={form.control}
             name="cancellationReason"
             label="Reason for cancellation"
             placeholder="Urgent meeting came up"

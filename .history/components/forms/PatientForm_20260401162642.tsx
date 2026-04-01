@@ -7,13 +7,15 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Form } from "@/components/ui/form";
-import { createUser } from "@/lib/actions/patient.actions";
+import { createUser, getPatient } from "@/lib/actions/patient.actions";
 import { UserFormValidation } from "@/lib/validation";
 
 import "react-phone-number-input/style.css";
 
 import SubmitButton from "../SubmitButton";
 import CustomFormField, { FormFieldType } from "../CustomForm";
+
+// ... imports stay the same
 
 export const PatientForm = () => {
   const router = useRouter();
@@ -32,29 +34,31 @@ export const PatientForm = () => {
     setIsLoading(true);
 
     try {
-      const user = {
+      const userData = {
         name: values.name,
         email: values.email,
         phone: values.phone,
       };
 
-      const newUser = await createUser(user);
+      // 1. Create the user in Appwrite Auth/Database
+      const newUser = await createUser(userData);
 
+      // 2. If successful, redirect to the registration page using the new ID
       if (newUser) {
         router.push(`/patients/${newUser.$id}/register`);
       }
     } catch (error) {
-      console.log(error);
+      console.log("Submit Error:", error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
         <section className="mb-12 space-y-4">
-          <h1 className="header">Daystar Afya</h1>
+          <h1 className="header">Amiani HealthCare System</h1>
           <p className="text-dark-700">Get started with appointments.</p>
         </section>
 
@@ -63,7 +67,7 @@ export const PatientForm = () => {
           control={form.control}
           name="name"
           label="Full name"
-          placeholder="Madede Chadwick"
+          placeholder="John Does"
           iconSrc="/assets/icons/user.svg"
           iconAlt="user"
         />

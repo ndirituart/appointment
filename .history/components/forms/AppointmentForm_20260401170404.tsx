@@ -35,15 +35,17 @@ export const AppointmentForm = ({
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-}) => {
+  }) => {
+  
+  //see how patientId is being communicated back that it keeps failing
+  console.log("PROPS CHECK - patientId:", patientId);
+  
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const AppointmentFormValidation = getAppointmentSchema(type);
 
-  type AppointmentFormType = z.infer<typeof AppointmentFormValidation>;
-  
-  const form = useForm<AppointmentFormType>({
+  const form = useForm<z.infer<typeof AppointmentFormValidation>>({
     resolver: zodResolver(AppointmentFormValidation),
     defaultValues: {
       primaryPhysician: appointment ? appointment?.primaryPhysician : "",
@@ -56,71 +58,77 @@ export const AppointmentForm = ({
     },
   });
 
-  const onSubmit = async (
-    values: z.infer<typeof AppointmentFormValidation>
-  ) => {
-    setIsLoading(true);
+ const onSubmit = async (values: z.infer<typeof AppointmentFormValidation>) => {
+  setIsLoading(true);
 
-    let status;
-    switch (type) {
-      case "schedule":
-        status = "scheduled";
-        break;
-      case "cancel":
-        status = "cancelled";
-        break;
-      default:
-        status = "pending";
-    }
+  try {
+    // --- CREATE FLOW ---
+    console.log("🔍 Component patientId:", patientId);
 
-    try {
-      if (type === "create" && patientId) {
-        const appointment = {
-          userId,
-          patientId,
+   if (type === "create") {
+  if (!patientId) {
+    console.error("❌ Aborting: patientId is undefined.");
+    setIsLoading(false);
+    return;
+  }
+
+  const appointmentData = {
+    userId,
+    patient: patientId, // ✅ Use 'patientId' to match your DB column, NOT 'patient'
+    primaryPhysician: values.primaryPhysician,
+    schedule: new Date(values.schedule),
+    reason: values.reason!,
+    status: status as Status,
+    note: values.note,
+  };
+
+  console.log("🛰️ Sending to DB:", appointmentData);
+     const newAppointment = await createAppointment(appointmentData);
+     
+      if (newAppointment) {
+        console.log("✅ Success: Appointment created", newAppointment.$id);
+        form.reset();
+        router.push(`/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`);
+      }
+    } 
+    
+    // --- UPDATE FLOW (Schedule or Cancel) ---
+    else {
+      if (!appointment?.$id) {
+        console.error("❌ Aborting: No appointment ID found for update.");
+        setIsLoading(false);
+        return;
+      }
+
+      const appointmentToUpdate = {
+        userId,
+        appointmentId: appointment.$id,
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        appointment: {
           primaryPhysician: values.primaryPhysician,
           schedule: new Date(values.schedule),
-          reason: values.reason!,
           status: status as Status,
-          note: values.note,
-        };
+          cancellationReason: values.cancellationReason,
+        },
+        type,
+      };
 
-        const newAppointment = await createAppointment(appointment);
+      console.log("🛰️ Attempting to UPDATE appointment:", appointmentToUpdate);
+      const updatedAppointment = await updateAppointment(appointmentToUpdate);
 
-        if (newAppointment) {
-          form.reset();
-          router.push(
-            `/patients/${userId}/new-appointment/success?appointmentId=${newAppointment.$id}`
-          );
-        }
-      } else {
-        const appointmentToUpdate = {
-          userId,
-          appointmentId: appointment?.$id!,
-          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          appointment: {
-            primaryPhysician: values.primaryPhysician,
-            schedule: new Date(values.schedule),
-            status: status as Status,
-            cancellationReason: values.cancellationReason,
-            
-
-          },
-          type,
-        };
-
-        const updatedAppointment = await updateAppointment(appointmentToUpdate);
-
-        if (updatedAppointment) {
-          setOpen && setOpen(false);
-          form.reset();
-        }
+      if (updatedAppointment) {
+        console.log("✅ Success: Appointment updated");
+        setOpen && setOpen(false);
+        form.reset();
       }
-    } catch (error) {
-      console.log(error);
     }
+  } catch (error) {
+    console.error(`❌ Global Error in ${type}:`, error);
+  } finally {
     setIsLoading(false);
-  };
+  }
+};
+
 
   let buttonLabel;
   switch (type) {
@@ -136,8 +144,15 @@ export const AppointmentForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-6">
-        {type === "create" && (
+  <form 
+        onSubmit={form.handleSubmit(onSubmit, (errors) => {
+      //better form error validation to find root cause of isses
+      console.log("⚠️ Validation Errors:", errors);
+    })} 
+    className="flex-1 space-y-6"
+      >
+        
+    {type === "create" && (
           <section className="mb-12 space-y-4">
             <h1 className="header">New Appointment</h1>
             <p className="text-dark-700">
@@ -150,7 +165,7 @@ export const AppointmentForm = ({
           <>
             <CustomFormField
               fieldType={FormFieldType.SELECT}
-              control={form.control as any}
+              control={form.control}
               name="primaryPhysician"
               label="Doctor"
               placeholder="Select a doctor"
@@ -173,7 +188,7 @@ export const AppointmentForm = ({
 
             <CustomFormField
               fieldType={FormFieldType.DATE_PICKER}
-              control={form.control as any}
+              control={form.control}
               name="schedule"
               label="Expected appointment date"
               showTimeSelect
@@ -181,20 +196,21 @@ export const AppointmentForm = ({
             />
 
             <div
-              className={`flex flex-col gap-6  ${type === "create" && "xl:flex-row"}`}
+              className={`flex flex-
+                 gap-6  ${type === "create" && "xl:flex-row"}`}
             >
               <CustomFormField
                 fieldType={FormFieldType.TEXTAREA}
-                control={form.control as any}
+                control={form.control}
                 name="reason"
                 label="Appointment reason"
-                placeholder="Annual montly check-up"
+                placeholder="Annual or monthly check-up"
                 disabled={type === "schedule"}
               />
 
               <CustomFormField
                 fieldType={FormFieldType.TEXTAREA}
-                control={form.control as any}
+                control={form.control}
                 name="note"
                 label="Comments/notes"
                 placeholder="Prefer afternoon appointments, if possible"
@@ -207,7 +223,7 @@ export const AppointmentForm = ({
         {type === "cancel" && (
           <CustomFormField
             fieldType={FormFieldType.TEXTAREA}
-            control={form.control as any}
+            control={form.control}
             name="cancellationReason"
             label="Reason for cancellation"
             placeholder="Urgent meeting came up"
@@ -222,5 +238,6 @@ export const AppointmentForm = ({
         </SubmitButton>
       </form>
     </Form>
+    
   );
 };
