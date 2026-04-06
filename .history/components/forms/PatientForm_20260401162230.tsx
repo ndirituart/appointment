@@ -67,7 +67,7 @@ const onSubmit = async (values: z.infer<typeof UserFormValidation>) => {
           control={form.control}
           name="name"
           label="Full name"
-          placeholder="Madede Chadwick"
+          placeholder="John Doe"
           iconSrc="/assets/icons/user.svg"
           iconAlt="user"
         />

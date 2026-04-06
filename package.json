@@ -37,6 +37,7 @@
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.53.0",
     "react-phone-number-input": "^3.4.5",
+    "resend": "^6.10.0",
     "tailwind-animate": "^0.2.10",
     "tailwind-merge": "^2.6.1",
     "tailwindcss-animate": "^1.0.7",
